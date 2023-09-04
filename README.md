@@ -6,3 +6,5 @@ G. Tolegen, A. Toleu, R. Mussabayev and A. Krassovitskiy, "A Clustering-based Ap
 
 ## Concepts
 Clustering-based topic model decomposes the large search space into two sub-spaces: |T| × |W| and |D| × |T|. Each of the sub-spaces cannot be very large in practice since |T| ≪ |D| and |T| ≪ |W|. First of all, the hidden topics of documents are found with a clustering algorithm in a subspace |T | × |W |, then the topic assignments in another small sub-space |T | × |D|. To uncover the thematic structure of a collection of documents, we proposed an approach based on adapting a community detection algorithm on a word network where vertices are words and edges are the distances between words. Several word representations are utilized for word network construction, and their effectiveness was compared through a set of experiments. To better assign the document with topics, two topic assignment approaches were applied and compared.
+
+## WNC library
