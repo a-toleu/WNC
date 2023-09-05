@@ -41,11 +41,11 @@ class CTM:
         self.docs = []
     
     
-    def getvocab_and_vectorized(self, docs, stopwords, optimized=0, njobs = 20):
+    def getvocab_and_vectorized(self, docs, optimized=0, njobs = 20):
 
         if optimized == 0:
             vocab = []
-            vectorizer = CountVectorizer(stop_words=stopwords, min_df=10,ngram_range=(1,1))
+            vectorizer = CountVectorizer(min_df=10,ngram_range=(1,1))
             X_cooc = vectorizer.fit_transform(docs)
             for x in vectorizer.get_feature_names_out():
                 vocab.append(x)
@@ -86,7 +86,7 @@ class CTM:
 
             return vocab,tfidfX, wtoi, itow
         
-    def similar_words(self, w1,model,tpn=100):
+    def similar_words(self, w1,model,wtoi,tpn=100):
         p1 = wtoi[w1]
         scores = {}
         for w,i in wtoi.items():
@@ -120,7 +120,7 @@ class CTM:
             embeds.append(vec.flatten())
         return embeds
 
-    def build_network_and_clustering(self, vocab, wvmodel, resolution = 0.85, nodeOpti=50, ranking=1):
+    def build_network_and_clustering(self, vocab, wvmodel,wtoi, resolution = 0.85, nodeOpti=50, ranking=1):
         G = nx.Graph()
         for i,n1 in enumerate(vocab[0:]):
             G.add_node(n1)
@@ -202,5 +202,68 @@ class CTM:
                 topics.append(topic)
         
         return topics, centroids
+    
+    def topic_assignment(self,docs, topics):
+        #topic assignment
+        #single processors
+
+        '''
+        1. jacard metric
+        2. distance between topic and doc
+        '''
+
+        predicted_labels = []
+        topic_vecs = []
+        for i, doc in enumerate(docs):
+            words = doc.split()
+            dists = []
+            for t,topic in enumerate(topics):
+                #1.jacard metric
+
+                A = set(words)
+                B = set(topic)
+                val = len(A.intersection(B))/len(A.union(B))
+
+                #2. distance between topic and doc
+        #         if i == 0:
+        #             topic_vec = projecting(topic[0:200],word_vectors,typ=3)
+        #             topic_vecs.append(topic_vec)
+        #         else:
+        #             topic_vec = topic_vecs[t]
+        #         doc_vec = projecting(words,word_vectors,typ=3)
+
+        #         val = cosine_similarity(topic_vec, doc_vec)[0][0]
+
+                dists.append(val)
+            maxi = np.argmax(dists)
+            predicted_labels.append(maxi)
+        return predicted_labels
+    
+    def clean_text(self, sentence):
+        # remove non alphabetic sequences
+        pattern = re.compile(r'[^a-z]+')
+        sentence = sentence.lower()
+        sentence = pattern.sub(' ', sentence).strip()
+
+        # Tokenize
+        word_list = word_tokenize(sentence)
+
+        # stop words
+        stopwords_list = set(stopwords.words('english'))
+
+        # remove stop words
+        word_list = [word for word in word_list if word not in stopwords_list]
+        # remove very small words, length < 3
+        word_list = [word for word in word_list if len(word) > 2]
+
+        # lemmatize
+        lemma = WordNetLemmatizer()
+        word_list = [lemma.lemmatize(word) for word in word_list]
+
+        # list to sentence
+        sentence = ' '.join(word_list)
+
+        return sentence
+
 
 
