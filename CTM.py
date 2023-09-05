@@ -75,7 +75,7 @@ class CTM:
                         vocab.append(w)
                         vocab_tfidf.append((w,sorted_filltered_ws['tfidf'][j]))
 
-            print("pariwise calculation...")
+            print("vectorization...")
             tfid_vec = TfidfVectorizer(use_idf=True, max_df = 1000, min_df = 5, tokenizer=lambda x: str(x).split(),vocabulary=vocab)
             X_tfidf = tfid_vec.fit_transform(docs)
 
