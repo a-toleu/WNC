@@ -30,26 +30,6 @@ def save_obj(obj, name):
     #pickle.dump(obj,open(name + '.pkl', 'wb'))
     pickle.dump(obj,open(name + '.pkl', 'wb'), protocol=4)
 
-
-# In[3]:
-
-# bow_corpus = load_obj('bow_corpus')
-
-# data_df = pd.read_csv('20news_train_df.csv')
-# # In[34]:
-
-
-# tokens_text = []
-# for doc in data_df['News'].values.astype('U'):
-#     for sent in sent_tokenize(doc):
-#         words = word_tokenize(sent)
-#         tokens_text.append(words)
-
-
-# from gensim.corpora import Dictionary
-# dictionary = Dictionary(tokens_text)
-# #|bow_corpus = dictionary.doc2bow(tokens_text)
-
 def Umass_coherence(topical_words,n_topword,bow_corpus,dictionary):
     topics_ = []
     for wt in topical_words:
