@@ -41,7 +41,7 @@ class CTM:
         self.docs = []
     
     
-    def getvocab_and_vectorized(self, docs, optimized=0, njobs = 20):
+    def getvocab_and_vectorized(self, docs, optimized=0, topw=10, njobs = 20):
 
         if optimized == 0:
             vocab = []
@@ -68,7 +68,7 @@ class CTM:
                 df = pd.DataFrame(X_tfidf[i].T.todense(), index= tfidf_vectorizer.get_feature_names_out(), columns=["tfidf"])
 
                 sorted_tfidf = df.sort_values(by=["tfidf"],ascending=False)
-                sorted_filltered_ws = sorted_tfidf[0:10]
+                sorted_filltered_ws = sorted_tfidf[0:topw]
 
                 for j,w in enumerate(sorted_filltered_ws.index):
                     if w not in vocab:
@@ -158,9 +158,9 @@ class CTM:
             for w in topic:
                 _topic.append((w,len(G[w])))
             if ranking == 1:
-                topics_sorted.append([w for w,e in sorted(_topic,key=lambda x:x[1], reverse=True)])
+                topics_sorted.append([(w,e) for w,e in sorted(_topic,key=lambda x:x[1], reverse=True)])
             else:
-                topics_sorted.append([w for w,e in _topic])
+                topics_sorted.append([(w,e) for w,e in _topic])
         return G, topics_sorted
 
     def kMeans_tm(self, vocab, wtoi, wvmodel, n, initA='random', max_iter=100, topM=10):
@@ -203,7 +203,7 @@ class CTM:
         
         return topics, centroids
     
-    def topic_assignment(self,docs, topics):
+    def topic_assignment(self,docs, topics, topM=10):
         #topic assignment
         #single processors
 
@@ -221,7 +221,7 @@ class CTM:
                 #1.jacard metric
 
                 A = set(words)
-                B = set(topic)
+                B = set(topic[0:topM])
                 val = len(A.intersection(B))/len(A.union(B))
 
                 #2. distance between topic and doc
